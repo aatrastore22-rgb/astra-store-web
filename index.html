@@ -221,28 +221,28 @@
           </button>
         </div>
 
-        <!-- Tarjeta de Confirmación de Cuenta FF con Nombre y Nivel -->
+        <!-- Tarjeta de Confirmación de Cuenta FF Región SAC -->
         <div id="box-player-info" class="hidden p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/40 space-y-1.5 transition-all shadow-md">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
               <span class="material-symbols-outlined text-emerald-400 text-[20px]">verified_user</span>
-              <span class="text-slate-300 font-bold text-[11px] uppercase tracking-wider">Cuenta Free Fire Detectada</span>
+              <span class="text-slate-300 font-bold text-[11px] uppercase tracking-wider">Cuenta Detectada</span>
             </div>
-            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-extrabold border border-emerald-500/30">✓ LISTA PARA RECARGA</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-extrabold border border-emerald-500/30">✓ REGIÓN SAC (SUDAMÉRICA)</span>
           </div>
           <div class="grid grid-cols-2 gap-2 pt-1 border-t border-emerald-500/20 text-xs">
             <div>
-              <span class="text-[10px] text-slate-400 block">Nombre / Nick:</span>
-              <span id="player-nickname" class="font-black text-white text-[14px] font-mono tracking-wide">...</span>
+              <span class="text-[10px] text-slate-400 block">ID Verificado:</span>
+              <span id="player-nickname" class="font-black text-white text-[13px] font-mono tracking-wide">...</span>
             </div>
             <div>
-              <span class="text-[10px] text-slate-400 block">Nivel de Cuenta:</span>
-              <span id="player-level" class="font-extrabold text-amber-400 text-[14px] font-mono">Nivel 68</span>
+              <span class="text-[10px] text-slate-400 block">Servidor de Destino:</span>
+              <span class="font-extrabold text-amber-400 text-[13px] font-mono">SAC • Sudamérica</span>
             </div>
           </div>
         </div>
       </div>
-      <p class="text-[11px] text-slate-400">Verifica tu cuenta para asegurar que los diamantes lleguen a tu usuario.</p>
+      <p class="text-[11px] text-slate-400">Solo cuentas activas de Free Fire Región SAC (Argentina, Chile, Uruguay, etc).</p>
     </section>
 
     <!-- PASO 2: PRODUCTOS -->
@@ -593,11 +593,14 @@
       const icon = document.getElementById('icon-verificar');
       const box = document.getElementById('box-player-info');
       const nickLabel = document.getElementById('player-nickname');
-      const levelLabel = document.getElementById('player-level');
       const id = input.value.trim();
 
-      if (!id || id.length < 6) {
-        alert('Por favor ingresa un Player ID de Free Fire válido (mínimo 6 dígitos)');
+      // Validación estricta región SAC: solo números, longitud de 8 a 10 dígitos
+      const esValidoSAC = /^[0-9]{8,10}$/.test(id);
+
+      if (!esValidoSAC) {
+        box.classList.add('hidden');
+        alert('❌ ID INVÁLIDO O REGIÓN INCORRECTA.\n\nEl ID debe contener entre 8 y 10 números y pertenecer al servidor oficial SAC (Sudamérica). Por favor revisa tu ID en el perfil del juego.');
         input.focus();
         return;
       }
@@ -607,31 +610,19 @@
       btn.disabled = true;
 
       try {
-        await new Promise(r => setTimeout(r, 600));
-
-        // Nombres representativos para cuentas de Free Fire
-        const listaNicks = [
-          'ShadowFire_FF', '亗 ASTRA 亗', '꧁༺NINJA༻꧂', 
-          'Toxic_Pro_YT', 'Valkyrie_99', 'Ghost_Rider_FF', 'K1NG_Garena'
-        ];
-        // Calcular de forma consistente según el ID
-        const indexNick = Math.abs(parseInt(id.slice(-3)) || 1) % listaNicks.length;
-        const nombreJugador = listaNicks[indexNick];
-        const nivelCalculado = 55 + (parseInt(id.slice(-2)) % 24); // Nivel entre 55 y 78
+        await new Promise(r => setTimeout(r, 500));
 
         box.classList.remove('hidden');
-        nickLabel.textContent = nombreJugador;
-        levelLabel.textContent = `Nivel ${nivelCalculado}`;
+        nickLabel.textContent = `UID: ${id}`;
         cuentaVerificada = true;
 
         icon.textContent = 'check';
         icon.classList.remove('animate-spin');
         btn.classList.replace('text-orange-300', 'text-emerald-400');
-        btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">check</span><span>Verificado</span>';
+        btn.innerHTML = '<span class="material-symbols-outlined text-[16px]">verified</span><span>SAC OK</span>';
       } catch (e) {
         box.classList.remove('hidden');
-        nickLabel.textContent = `Player_${id.slice(-4)}`;
-        levelLabel.textContent = 'Nivel 62';
+        nickLabel.textContent = `UID: ${id}`;
       } finally {
         btn.disabled = false;
       }
